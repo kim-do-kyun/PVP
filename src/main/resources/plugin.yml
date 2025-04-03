@@ -1,0 +1,10 @@
+name: PVP
+version: '1.0-SNAPSHOT'
+main: org.desp.pVP.PVP
+api-version: '1.20'
+depend: [MMOItems, MythicLib, MongoLibraryPlugin, MMOMail, MMOCore, BinggreAPI]
+commands:
+  대전매칭:
+    aliases: ["eowjsaocld"]
+  매칭취소:
+    aliases: ["aocldcnlth"]
