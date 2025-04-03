@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.desp.pVP.command.CancelMatchCommand;
 import org.desp.pVP.command.MatchingCommand;
+import org.desp.pVP.command.RecordCommand;
 import org.desp.pVP.database.PlayerDataRepository;
 import org.desp.pVP.listener.AugmentConfirmListener;
 import org.desp.pVP.listener.PVPEndListener;
@@ -28,6 +29,7 @@ public final class PVP extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new AugmentConfirmListener(), this);
         getCommand("대전매칭").setExecutor(new MatchingCommand());
         getCommand("매칭취소").setExecutor(new CancelMatchCommand());
+        getCommand("전적확인").setExecutor(new RecordCommand());
     }
 
     @Override

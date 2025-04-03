@@ -8,3 +8,5 @@ commands:
     aliases: ["eowjsaocld"]
   매칭취소:
     aliases: ["aocldcnlth"]
+  전적확인:
+    aliases: ["wjswjrghkrdls"]

@@ -1,16 +1,20 @@
 package org.desp.pVP.command;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.desp.pVP.database.PlayerDataRepository;
 import org.desp.pVP.dto.MatchingPlayerDto;
 import org.desp.pVP.utils.DateUtils;
 import org.desp.pVP.utils.MatchManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class MatchingCommand implements CommandExecutor {
+public class MatchingCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s,
                              @NotNull String[] strings) {
@@ -25,8 +29,17 @@ public class MatchingCommand implements CommandExecutor {
                 .joinTime(DateUtils.getCurrentTime())
                 .build();
 
-        MatchManager.getInstance().joinQueue(matchingPlayer);
-        player.sendMessage("§a[" + matchingPlayer.getTier() + "] 티어로 매칭을 시작합니다...");
+        switch (strings[0]){
+            case "랭크":
+                MatchManager.getInstance().joinQueue(matchingPlayer, "랭크");
+                break;
+            case "친선":
+                MatchManager.getInstance().joinQueue(matchingPlayer, "친선");
+                break;
+            default:
+                player.sendMessage("§e 잘못된 명령어입니다.");
+                break;
+        }
         return true;
     }
 
@@ -35,5 +48,14 @@ public class MatchingCommand implements CommandExecutor {
     }
     private String getPlayerTier(Player player) {
         return PlayerDataRepository.getInstance().getPlayerData(player).getTier();
+    }
+
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command,
+                                                @NotNull String s, @NotNull String[] strings) {
+        List<String> complition = new ArrayList<>();
+        complition.add("친선");
+        complition.add("랭크");
+        return complition;
     }
 }

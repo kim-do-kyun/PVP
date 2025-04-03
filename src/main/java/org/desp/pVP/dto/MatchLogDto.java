@@ -13,5 +13,6 @@ public class MatchLogDto {
     private String winner;
     private String startTime;
     private String endTime;
+    private String type;
     private Map<String, Integer> pointChange;
 }

@@ -16,6 +16,7 @@ public class CancelMatchCommand implements CommandExecutor {
 
         boolean removed = MatchManager.getInstance().cancelQueue(uuid);
         if (removed) {
+            MatchManager.getInstance().stopWaitingThread(uuid);
             player.sendMessage("§c매칭 대기열에서 나갔습니다.");
         } else {
             player.sendMessage("§e당신은 현재 매칭 대기 중이 아닙니다.");

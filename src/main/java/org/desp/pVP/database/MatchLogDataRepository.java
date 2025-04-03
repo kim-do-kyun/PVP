@@ -34,6 +34,7 @@ public class MatchLogDataRepository {
                 .append("winner", matchLog.getWinner())
                 .append("startTime", matchLog.getStartTime())
                 .append("endTime", matchLog.getEndTime())
+                .append("type", matchLog.getType())
                 .append("pointChange", matchLog.getPointChange());
 
         matchLogDB.insertOne(document);
