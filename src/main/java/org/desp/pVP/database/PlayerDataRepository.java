@@ -82,6 +82,14 @@ public class PlayerDataRepository {
         );
     }
 
+    public String getPlayerNameToUUID(String user_id) {
+        Document document = playerList.find(Filters.eq("user_id", user_id)).first();
+        if (document != null) {
+            return document.getString("uuid");
+        }
+        return null;
+    }
+
     public Map<String, PlayerDataDto> getPlayerDataCache() {
         return playerDataCache;
     }

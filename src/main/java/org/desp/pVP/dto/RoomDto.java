@@ -6,7 +6,10 @@ import lombok.Setter;
 
 @Getter @Setter
 @Builder
-public class MapDataDto {
-    private String type;
+public class RoomDto {
+    private String roomName;
     private boolean isPlaying;
+    private String playerAWarpLocation;
+    private String playerBWarpLocation;
 }
+
