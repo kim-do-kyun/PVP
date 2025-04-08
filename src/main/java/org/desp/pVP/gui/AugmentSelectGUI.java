@@ -7,7 +7,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.desp.pVP.utils.AugmentType;
 import org.desp.pVP.utils.MatchSession;
 import org.jetbrains.annotations.NotNull;
 

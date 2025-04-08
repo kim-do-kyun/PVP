@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.desp.pVP.PVP;
@@ -18,10 +16,10 @@ import org.desp.pVP.dto.MatchLogDto;
 import org.desp.pVP.dto.MatchingPlayerDto;
 import org.desp.pVP.dto.PlayerDataDto;
 import org.desp.pVP.dto.RoomDto;
-import org.desp.pVP.gui.AugmentSelectGUI;
 
 public class MatchManager {
     private static MatchManager instance;
+    private static int point = 23;
     private final Map<String, MatchSession> activeSessions = new HashMap<>();
     private final List<MatchingPlayerDto> rankQueue = new ArrayList<>();
     private final List<MatchingPlayerDto> friendlyQueue = new ArrayList<>();
@@ -47,7 +45,7 @@ public class MatchManager {
 
         if ("친선".equals(type)) {
             for (MatchingPlayerDto other : friendlyQueue) {
-                if (canMatch(player, other)) {
+                if (canMatch(player, other, type)) {
                     friendlyQueue.remove(other);
                     stopWaitingThread(player.getUuid());
                     stopWaitingThread(other.getUuid());
@@ -58,7 +56,7 @@ public class MatchManager {
             friendlyQueue.add(player);
         } else if ("랭크".equals(type)) {
             for (MatchingPlayerDto other : rankQueue) {
-                if (canMatch(player, other)) {
+                if (canMatch(player, other, type)) {
                     rankQueue.remove(other);
                     stopWaitingThread(player.getUuid());
                     stopWaitingThread(other.getUuid());
@@ -123,7 +121,7 @@ public class MatchManager {
         MatchSession session = new MatchSession(a.getUuid(), b.getUuid(), type);
         session.setRoom(room);
 
-        // 최근 매칭 기록 추가
+        // 최근 매칭 기록 추가(패작 막는용)
         if ("랭크".equals(type)) {
             recentOpponentMap.put(a.getUuid(), b.getUuid());
             recentOpponentMap.put(b.getUuid(), a.getUuid());
@@ -135,7 +133,7 @@ public class MatchManager {
             if (player != null) {
                 player.sendMessage("§e매칭이 성사되었습니다! 5초 안에 증강을 선택해주세요.");
                 // 증강 GUI
-                player.openInventory(new AugmentSelectGUI(session).getInventory());
+                //player.openInventory(new AugmentSelectGUI(session).getInventory());
             }
         }
         // 증강 선택에서 session 해결해야함
@@ -176,26 +174,40 @@ public class MatchManager {
             loser.sendActionBar("§l§c[친선전 패배]");
 
         } else if ("랭크".equals(session.getType())) {
-            winner.sendTitle("§l§a승리!", "§7랭크 포인트 +3", 10, 60, 10);
-            winner.sendActionBar("§l§a[랭크 승리] +3 포인트 획득!");
+            winner.sendTitle("§l§a승리!", "§7랭크 포인트 +" + point, 10, 60, 10);
+            winner.sendActionBar("§l§a[랭크 승리] +" + point + " 포인트 획득!");
 
-            loser.sendTitle("§l§c패배", "§7랭크 포인트 -3", 10, 60, 10);
-            loser.sendActionBar("§l§c[랭크 패배] -3 포인트 차감...");
+            loser.sendTitle("§l§c패배", "§7랭크 포인트 -" + point, 10, 60, 10);
+            loser.sendActionBar("§l§c[랭크 패배] -" + point + " 포인트 차감...");
 
             // 승, 패 적립 및 포인트 지급
+            // 승리시
             PlayerDataDto winnerDataDto = playerDataCache.get(winnerId);
             winnerDataDto.setWins(winnerDataDto.getWins()+1);
-            winnerDataDto.setPoint(winnerDataDto.getPoint() + 3);
+            winnerDataDto.setPoint(winnerDataDto.getPoint() + point);
+            String winnerPrevTier = winnerDataDto.getTier();
+            String winnerNewTier = getTierFromPoint(winnerDataDto.getPoint());
+            winnerDataDto.setTier(winnerNewTier);
+            if (!winnerPrevTier.equals(winnerNewTier)) {
+                winner.sendMessage("§b[승급] 티어가 " + winnerPrevTier + " → " + winnerNewTier + " 로 승급되었습니다!");
+            }
             playerDataCache.put(winnerId, winnerDataDto);
 
+            // 패배시
             PlayerDataDto loserDataDto = playerDataCache.get(loserId);
             loserDataDto.setLosses(loserDataDto.getLosses()+1);
-            loserDataDto.setPoint(loserDataDto.getPoint() - 3);
+            loserDataDto.setPoint(loserDataDto.getPoint() - point);
+            String loserPrevTier = loserDataDto.getTier();
+            String loserNewTier = getTierFromPoint(loserDataDto.getPoint());
+            loserDataDto.setTier(loserNewTier);
+            if (!loserPrevTier.equals(loserNewTier)) {
+                loser.sendMessage("§c[강등] 티어가 " + loserPrevTier + " → " + loserNewTier + " 로 강등되었습니다...");
+            }
             playerDataCache.put(loserId, loserDataDto);
 
             // 점수 설정
-            pointChange.put(winnerName, 3);
-            pointChange.put(loserName, -3);
+            pointChange.put(winnerName, point);
+            pointChange.put(loserName, -point);
         }
         MatchLogDto matchLogDto = MatchLogDto.builder()
                 .playerA(winnerName)
@@ -213,6 +225,21 @@ public class MatchManager {
         session.teleportSpawn();
     }
 
+    private String getTierFromPoint(int point) {
+        if (point >= 120) return "챌린저";
+        else if (point >= 100) return "마스터";
+        else if (point >= 80) return "다이아";
+        else if (point >= 60) return "플레티넘";
+        else if (point >= 40) return "골드";
+        else if (point >= 20) return "실버";
+        else return "브론즈";
+    }
+
+    public boolean isInCombat(String uuid) {
+        MatchSession session = activeSessions.get(uuid);
+        return session != null && session.isFightStarted();
+    }
+
     private boolean checkDuplicateQueue(MatchingPlayerDto player) {
         boolean isInRank = rankQueue.stream().anyMatch(p -> p.getUuid().equals(player.getUuid()));
         boolean isInFriendly = friendlyQueue.stream().anyMatch(p -> p.getUuid().equals(player.getUuid()));
@@ -227,8 +254,10 @@ public class MatchManager {
         return false;
     }
 
-    private boolean canMatch(MatchingPlayerDto a, MatchingPlayerDto b) {
-        if (!a.getTier().equals(b.getTier())) return false;
+    private boolean canMatch(MatchingPlayerDto a, MatchingPlayerDto b, String type) {
+        if ("랭크".equals(type) && !a.getTier().equals(b.getTier())) {
+            return false;
+        }
 
         String aRecent = recentOpponentMap.get(a.getUuid());
         String bRecent = recentOpponentMap.get(b.getUuid());

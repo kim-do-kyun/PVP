@@ -36,7 +36,7 @@ public class PlayerDataRepository {
             Document newUserDocument = new Document()
                     .append("user_id", user_id)
                     .append("uuid", uuid)
-                    .append("tier", "Bronze")
+                    .append("tier", "브론즈")
                     .append("point", 0)
                     .append("wins", 0)
                     .append("losses", 0);

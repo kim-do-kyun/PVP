@@ -24,9 +24,10 @@ public final class PVP extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
-        Bukkit.getOnlinePlayers().forEach(player ->
-                PlayerDataRepository.getInstance().loadPlayerData(player)
-        );
+        Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
+        for (Player player : onlinePlayers) {
+            PlayerDataRepository.getInstance().loadPlayerData(player);
+        }
 
         Bukkit.getPluginManager().registerEvents(new PlayerJoinAndQuitListener(), this);
         Bukkit.getPluginManager().registerEvents(new PVPEndListener(), this);

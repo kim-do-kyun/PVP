@@ -4,9 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.desp.pVP.gui.AugmentSelectGUI;
 import org.desp.pVP.utils.MatchSession;
@@ -29,7 +27,6 @@ public class AugmentConfirmListener implements Listener {
         String plusStat = clickedDifficulty.getItemMeta().getDisplayName();
 
         session.selectAugment(player.getName(), plusStat);
-
 
         player.closeInventory();
         // 선택한 증강 적용 후 게임 진입

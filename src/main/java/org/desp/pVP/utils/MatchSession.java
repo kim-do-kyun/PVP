@@ -18,12 +18,13 @@ import org.desp.pVP.dto.RoomDto;
 @Getter @Setter
 public class MatchSession {
     private RoomDto room;
+    private boolean fightStarted = false;
+    private final String type;
     private final String playerA;
     private final String playerB;
     private final String startTime;
     private String endTime;
     private final Map<String, String> augmentSelections = new HashMap<>();
-    private final String type;
 
     public MatchSession(String playerA, String playerB, String type) {
         this.playerA = playerA;
@@ -45,6 +46,7 @@ public class MatchSession {
 
     public void beginFight() {
         //applyAugments();
+        this.fightStarted = true;
         Player playerA = Bukkit.getPlayer(UUID.fromString(this.playerA));
         Player playerB = Bukkit.getPlayer(UUID.fromString(this.playerB));
 
@@ -98,21 +100,6 @@ public class MatchSession {
         //scheduledTaskIds.add(startId);
     }
 
-
-//    public void cancelScheduledTasks() {
-//        for (int taskId : scheduledTaskIds) {
-//            Bukkit.getScheduler().cancelTask(taskId);
-//        }
-//        scheduledTaskIds.clear();
-//    }
-//    private void applyAugments() {
-//        for (Map.Entry<String, AugmentType> entry : augmentSelections.entrySet()) {
-//            Player player = Bukkit.getPlayer(UUID.fromString(entry.getKey()));
-//            if (player == null) continue;
-//
-//        }
-//    }
-
     public void teleportSpawn() {
         Player playerA = Bukkit.getPlayer(UUID.fromString(this.playerA));
         Player playerB = Bukkit.getPlayer(UUID.fromString(this.playerB));
@@ -120,6 +107,7 @@ public class MatchSession {
         if (playerA != null) playerA.teleport(new Location(Bukkit.getWorld("world"), -21.475, 37.000, -737.459));
         if (playerB != null) playerB.teleport(new Location(Bukkit.getWorld("world"), -21.475, 37.000, -737.459));
     }
+
 
     public List<String> getPlayers() {
         return Arrays.asList(playerA, playerB);
@@ -133,5 +121,8 @@ public class MatchSession {
         return getOpponent(loser);
     }
 
-    public void  endMatch() { this.endTime = DateUtils.getCurrentTime(); }
+    public void  endMatch() {
+        this.endTime = DateUtils.getCurrentTime();
+        this.fightStarted = false;
+    }
 }
