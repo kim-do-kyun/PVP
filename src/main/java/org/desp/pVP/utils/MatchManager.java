@@ -22,17 +22,21 @@ import org.desp.pVP.dto.RoomDto;
 
 public class MatchManager {
     private static MatchManager instance;
-    private static int point = 23;
     private final Map<String, MatchSession> activeSessions = new HashMap<>();
     private final List<MatchingPlayerDto> rankQueue = new ArrayList<>();
     private final List<MatchingPlayerDto> friendlyQueue = new ArrayList<>();
     private final Map<String, Thread> waitingThreads = new ConcurrentHashMap<>();
-    private final Map<String, String> recentOpponentMap = new HashMap<>();
+    public final Map<String, String> recentOpponentMap = new HashMap<>();
     private final Map<String, RespawnMessageDto> postRespawnMessageMap = new ConcurrentHashMap<>();
 
     public static MatchManager getInstance() {
         if (instance == null) instance = new MatchManager();
         return instance;
+    }
+
+    public void removeOpponentCache(String aUUID, String bUUID) {
+        recentOpponentMap.remove(aUUID, bUUID);
+        recentOpponentMap.remove(bUUID, aUUID);
     }
 
     public void joinQueue(MatchingPlayerDto player, String type) {
@@ -137,7 +141,8 @@ public class MatchManager {
             activeSessions.put(uuid, session);
             Player player = Bukkit.getPlayer(UUID.fromString(uuid));
             if (player != null) {
-                player.sendMessage("§e매칭이 성사되었습니다! 5초 안에 증강을 선택해주세요.");
+//                player.sendMessage("§e매칭이 성사되었습니다! 5초 안에 증강을 선택해주세요.");
+                player.sendMessage("§e매칭이 성사되었습니다! 5초 뒤에 대전에 진입합니다.");
                 // 증강 GUI
                 //player.openInventory(new AugmentSelectGUI(session).getInventory());
             }
@@ -188,6 +193,7 @@ public class MatchManager {
             setPostRespawnMessage(loserId, message);
 
         } else if ("랭크".equals(session.getType())) {
+            int point = 23;
             winner.sendTitle("§l§a승리!", "§7랭크 포인트 +" + point, 10, 60, 10);
             winner.sendActionBar("§l§a[랭크 승리] +" + point + " 포인트 획득!");
 

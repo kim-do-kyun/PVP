@@ -5,9 +5,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.desp.pVP.command.CancelMatchCommand;
 import org.desp.pVP.command.MatchingCommand;
-import org.desp.pVP.command.RecordCommand;
 import org.desp.pVP.database.ArenaRepository;
 import org.desp.pVP.database.PlayerDataRepository;
 import org.desp.pVP.listener.AugmentConfirmListener;
@@ -34,9 +32,7 @@ public final class PVP extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PVPEndListener(), this);
         Bukkit.getPluginManager().registerEvents(new AugmentConfirmListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerRespawnListener(), this);
-        getCommand("대전매칭").setExecutor(new MatchingCommand());
-        getCommand("매칭취소").setExecutor(new CancelMatchCommand());
-        getCommand("전적확인").setExecutor(new RecordCommand());
+        getCommand("대전").setExecutor(new MatchingCommand());
 
         ArenaRepository.getInstance().loadAllRooms();
     }

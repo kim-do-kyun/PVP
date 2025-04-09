@@ -4,9 +4,7 @@ main: org.desp.pVP.PVP
 api-version: '1.20'
 depend: [MMOItems, MythicLib, MongoLibraryPlugin, MMOMail, MMOCore, BinggreAPI]
 commands:
-  대전매칭:
-    aliases: ["eowjsaocld"]
-  매칭취소:
-    aliases: ["aocldcnlth"]
-  전적확인:
-    aliases: ["wjswjrghkrdls"]
+  대전:
+    aliases: ["eowjs"]
+#  전적확인:
+#    aliases: ["wjswjrghkrdls"]
