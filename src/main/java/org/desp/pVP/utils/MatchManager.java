@@ -25,6 +25,7 @@ public class MatchManager {
     private final List<MatchingPlayerDto> friendlyQueue = new ArrayList<>();
     private final Map<String, Thread> waitingThreads = new ConcurrentHashMap<>();
     private final Map<String, String> recentOpponentMap = new HashMap<>();
+    private final Map<String, String> postRespawnMessageMap = new ConcurrentHashMap<>();
 
     public static MatchManager getInstance() {
         if (instance == null) instance = new MatchManager();
@@ -37,8 +38,10 @@ public class MatchManager {
             return;
         }
         Player bukkitPlayer = Bukkit.getPlayer(UUID.fromString(player.getUuid()));
-        if (bukkitPlayer != null) {
+        if (bukkitPlayer != null && "랭크".equals(type)) {
             bukkitPlayer.sendMessage("§a[" + player.getTier() + "] 티어(" +type+  ")로 매칭을 시작합니다...");
+        } else if (bukkitPlayer != null && "친선".equals(type)) {
+            bukkitPlayer.sendMessage("§a친선대전 으로 매칭을 시작합니다...");
         }
 
         startWaitingThread(player.getUuid());
@@ -135,6 +138,7 @@ public class MatchManager {
                 // 증강 GUI
                 //player.openInventory(new AugmentSelectGUI(session).getInventory());
             }
+
         }
         // 증강 선택에서 session 해결해야함
         Bukkit.getScheduler().runTaskLater(PVP.getInstance(), session::beginFight, 100L);
@@ -180,6 +184,8 @@ public class MatchManager {
             loser.sendTitle("§l§c패배", "§7랭크 포인트 -" + point, 10, 60, 10);
             loser.sendActionBar("§l§c[랭크 패배] -" + point + " 포인트 차감...");
 
+            postRespawnMessageMap.put(loserId, "§l§c패배;;§7랭크 포인트 -" + point);
+
             // 승, 패 적립 및 포인트 지급
             // 승리시
             PlayerDataDto winnerDataDto = playerDataCache.get(winnerId);
@@ -196,7 +202,9 @@ public class MatchManager {
             // 패배시
             PlayerDataDto loserDataDto = playerDataCache.get(loserId);
             loserDataDto.setLosses(loserDataDto.getLosses()+1);
-            loserDataDto.setPoint(loserDataDto.getPoint() - point);
+            // 점수 0 이하로 안떨어지게
+            int newPoint = Math.max(0, loserDataDto.getPoint() - point);
+            loserDataDto.setPoint(newPoint);
             String loserPrevTier = loserDataDto.getTier();
             String loserNewTier = getTierFromPoint(loserDataDto.getPoint());
             loserDataDto.setTier(loserNewTier);
