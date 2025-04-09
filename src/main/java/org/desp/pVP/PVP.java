@@ -13,6 +13,7 @@ import org.desp.pVP.database.PlayerDataRepository;
 import org.desp.pVP.listener.AugmentConfirmListener;
 import org.desp.pVP.listener.PVPEndListener;
 import org.desp.pVP.listener.PlayerJoinAndQuitListener;
+import org.desp.pVP.listener.PlayerRespawnListener;
 import org.desp.pVP.utils.MatchManager;
 
 public final class PVP extends JavaPlugin {
@@ -32,6 +33,7 @@ public final class PVP extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerJoinAndQuitListener(), this);
         Bukkit.getPluginManager().registerEvents(new PVPEndListener(), this);
         Bukkit.getPluginManager().registerEvents(new AugmentConfirmListener(), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerRespawnListener(), this);
         getCommand("대전매칭").setExecutor(new MatchingCommand());
         getCommand("매칭취소").setExecutor(new CancelMatchCommand());
         getCommand("전적확인").setExecutor(new RecordCommand());

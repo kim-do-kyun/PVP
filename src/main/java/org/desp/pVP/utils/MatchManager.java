@@ -1,5 +1,7 @@
 package org.desp.pVP.utils;
 
+import static org.desp.pVP.utils.MatchUtils.getTierFromPoint;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +17,7 @@ import org.desp.pVP.database.PlayerDataRepository;
 import org.desp.pVP.dto.MatchLogDto;
 import org.desp.pVP.dto.MatchingPlayerDto;
 import org.desp.pVP.dto.PlayerDataDto;
+import org.desp.pVP.dto.RespawnMessageDto;
 import org.desp.pVP.dto.RoomDto;
 
 public class MatchManager {
@@ -25,7 +28,7 @@ public class MatchManager {
     private final List<MatchingPlayerDto> friendlyQueue = new ArrayList<>();
     private final Map<String, Thread> waitingThreads = new ConcurrentHashMap<>();
     private final Map<String, String> recentOpponentMap = new HashMap<>();
-    private final Map<String, String> postRespawnMessageMap = new ConcurrentHashMap<>();
+    private final Map<String, RespawnMessageDto> postRespawnMessageMap = new ConcurrentHashMap<>();
 
     public static MatchManager getInstance() {
         if (instance == null) instance = new MatchManager();
@@ -174,17 +177,30 @@ public class MatchManager {
             winner.sendTitle("§l§a승리!", "§7포인트는 없지만 실력은 증명됐어요!", 10, 60, 10);
             winner.sendActionBar("§l§a[친선전 승리]");
 
-            loser.sendTitle("§l§c패배", "§7친선전에서는 패배해도 손해는 없습니다!", 10, 60, 10);
-            loser.sendActionBar("§l§c[친선전 패배]");
+//            loser.sendTitle("§l§c패배", "§7친선전에서는 패배해도 손해는 없습니다!", 10, 60, 10);
+//            loser.sendActionBar("§l§c[친선전 패배]");
+            RespawnMessageDto message = RespawnMessageDto.builder()
+                    .title("§l§c패배")
+                    .subtitle("§7친선전에서는 패배해도 손해는 없습니다!")
+                    .actionBar("§l§c[친선전 패배]")
+                    .build();
+
+            setPostRespawnMessage(loserId, message);
 
         } else if ("랭크".equals(session.getType())) {
             winner.sendTitle("§l§a승리!", "§7랭크 포인트 +" + point, 10, 60, 10);
             winner.sendActionBar("§l§a[랭크 승리] +" + point + " 포인트 획득!");
 
-            loser.sendTitle("§l§c패배", "§7랭크 포인트 -" + point, 10, 60, 10);
-            loser.sendActionBar("§l§c[랭크 패배] -" + point + " 포인트 차감...");
+//            loser.sendTitle("§l§c패배", "§7랭크 포인트 -" + point, 10, 60, 10);
+//            loser.sendActionBar("§l§c[랭크 패배] -" + point + " 포인트 차감...");
 
-            postRespawnMessageMap.put(loserId, "§l§c패배;;§7랭크 포인트 -" + point);
+            RespawnMessageDto message = RespawnMessageDto.builder()
+                    .title("§l§c패배")
+                    .subtitle("§7랭크 포인트 -" + point)
+                    .actionBar("§l§c[랭크 패배] -" + point + " 포인트 차감...")
+                    .build();
+
+            setPostRespawnMessage(loserId, message);
 
             // 승, 패 적립 및 포인트 지급
             // 승리시
@@ -233,15 +249,6 @@ public class MatchManager {
         session.teleportSpawn();
     }
 
-    private String getTierFromPoint(int point) {
-        if (point >= 120) return "챌린저";
-        else if (point >= 100) return "마스터";
-        else if (point >= 80) return "다이아";
-        else if (point >= 60) return "플레티넘";
-        else if (point >= 40) return "골드";
-        else if (point >= 20) return "실버";
-        else return "브론즈";
-    }
 
     public boolean isInCombat(String uuid) {
         MatchSession session = activeSessions.get(uuid);
@@ -283,4 +290,17 @@ public class MatchManager {
         boolean removedFromFriendly = friendlyQueue.removeIf(player -> player.getUuid().equals(uuid));
         return removedFromRank || removedFromFriendly;
     }
+
+    public void setPostRespawnMessage(String uuid, RespawnMessageDto message) {
+        postRespawnMessageMap.put(uuid, message);
+    }
+
+    public RespawnMessageDto getPostRespawnMessage(String uuid) {
+        return postRespawnMessageMap.get(uuid);
+    }
+
+    public void removePostRespawnMessage(String uuid) {
+        postRespawnMessageMap.remove(uuid);
+    }
+
 }
