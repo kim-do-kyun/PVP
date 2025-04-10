@@ -34,11 +34,6 @@ public class MatchManager {
         return instance;
     }
 
-    public void removeOpponentCache(String aUUID, String bUUID) {
-        recentOpponentMap.remove(aUUID, bUUID);
-        recentOpponentMap.remove(bUUID, aUUID);
-    }
-
     public void joinQueue(MatchingPlayerDto player, String type) {
         // 중복 큐 체크(랭크 큐 잡을때 친선 큐 못잡음)
         if (checkDuplicateQueue(player)) {

@@ -60,15 +60,6 @@ public class MatchingCommand implements CommandExecutor, TabCompleter {
             }
         } else if ("전적확인".equals(strings[0])) {
             player.sendMessage("§f 플레이어님의 티어 : " + tier + " / 승: " + wins + " / 패: " + losses);
-        } else if ("전적삭제".equals(strings[0])) {
-            String playerAName = strings[1];
-            String playerBName = strings[2];
-
-            String playerAUUID = PlayerDataRepository.getInstance().getPlayerNameToUUID(playerAName);
-            String playerBUUID = PlayerDataRepository.getInstance().getPlayerNameToUUID(playerBName);
-            MatchManager.getInstance().removeOpponentCache(playerAUUID, playerBUUID);
-
-            player.sendMessage("§e " + playerAName + "님 과 " + playerBName + "님의 대전 기록이 삭제되었습니다");
         }
         return true;
     }
