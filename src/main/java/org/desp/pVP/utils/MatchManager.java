@@ -276,6 +276,7 @@ public class MatchManager {
         String message = "[§6" + matchLogDto.getType() + "] §f" + winnerName + "님과 " + loserName + "님의 대결에서 §9" + winnerName + "§f님이 승리하였습니다!!";
 
         Bukkit.broadcastMessage(message);
+        session.setFightStarted(false);
 
         // 결과 로그 디비 저장
         MatchLogDataRepository.getInstance().saveMatchLog(matchLogDto);
