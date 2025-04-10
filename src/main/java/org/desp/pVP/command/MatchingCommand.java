@@ -35,10 +35,19 @@ public class MatchingCommand implements CommandExecutor, TabCompleter {
                 .joinTime(DateUtils.getCurrentTime())
                 .build();
 
-        // 대전 매칭 랭크/친선
-        // 대전 매칭취소
-        // 대전 전적확인
-        if ("매칭".equals(strings[0])) {
+        if (strings.length == 0) {
+            player.sendMessage("§f /대전 매칭 랭크 - 랭크전 매칭 대기열에 진입합니다.");
+            player.sendMessage("§f /대전 매칭 친선 - 친선전 매칭 대기열에 진입합니다.");
+            player.sendMessage("§f /대전 매칭취소 - 매칭 대기열에서 퇴장합니다.");
+            player.sendMessage("§f /대전 전적확인 - 랭크 티어와 승, 패 전적을 확인할 수 있습니다.");
+            return true;
+        } else if ("매칭".equals(strings[0]) && strings.length == 1) {
+            player.sendMessage("§f /대전 매칭 랭크 - 랭크전 매칭 대기열에 진입합니다.");
+            player.sendMessage("§f /대전 매칭 친선 - 친선전 매칭 대기열에 진입합니다.");
+            return true;
+        }
+
+        if ("매칭".equals(strings[0]) && strings.length == 2) {
             switch (strings[1]){
                 case "랭크":
                     MatchManager.getInstance().joinQueue(matchingPlayer, "랭크");
@@ -59,7 +68,15 @@ public class MatchingCommand implements CommandExecutor, TabCompleter {
                 player.sendMessage("§e당신은 현재 매칭 대기 중이 아닙니다.");
             }
         } else if ("전적확인".equals(strings[0])) {
-            player.sendMessage("§f 플레이어님의 티어 : " + tier + " / 승: " + wins + " / 패: " + losses);
+            if (strings.length == 1) {
+                player.sendMessage("§f 플레이어님의 티어 : " + tier + " / 승: " + wins + " / 패: " + losses);
+            } else if (strings.length == 2) {
+                String user_id = strings[1];
+                String playerNameToUUID = PlayerDataRepository.getInstance().getPlayerNameToUUID(user_id);
+                PlayerDataDto playerDataDto = PlayerDataRepository.getInstance().getPlayerDataCache()
+                        .get(playerNameToUUID);
+                player.sendMessage("§f " + user_id +  "님의 티어 : " + playerDataDto.getTier() + " / 승: " + playerDataDto.getWins() + " / 패: " + playerDataDto.getLosses());
+            }
         }
         return true;
     }
@@ -74,7 +91,6 @@ public class MatchingCommand implements CommandExecutor, TabCompleter {
             completions.add("매칭");
             completions.add("매칭취소");
             completions.add("전적확인");
-            completions.add("전적삭제");
         } else if (strings.length == 2 && "매칭".equalsIgnoreCase(strings[0])) {
             completions.add("랭크");
             completions.add("친선");

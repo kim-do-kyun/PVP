@@ -40,10 +40,37 @@ public class MatchManager {
             return;
         }
         Player bukkitPlayer = Bukkit.getPlayer(UUID.fromString(player.getUuid()));
+
+
         if (bukkitPlayer != null && "랭크".equals(type)) {
-            bukkitPlayer.sendMessage("§a[" + player.getTier() + "] 티어(" +type+  ")로 매칭을 시작합니다...");
+            switch (player.getTier()) {
+                case "브론즈":
+                    bukkitPlayer.sendMessage("§6[랭크] §f티어(§e브론즈§f)로 매칭을 시작합니다...");
+                    break;
+                case "실버":
+                    bukkitPlayer.sendMessage("§6[랭크] §f티어(§7실버§f)로 매칭을 시작합니다...");
+                    break;
+                case "골드":
+                    bukkitPlayer.sendMessage("§6[랭크] §f티어(§6골드§f)로 매칭을 시작합니다...");
+                    break;
+                case "플레티넘":
+                    bukkitPlayer.sendMessage("§6[랭크] §f티어(§a플레티넘§f)로 매칭을 시작합니다...");
+                    break;
+                case "다이아":
+                    bukkitPlayer.sendMessage("§6[랭크] §f티어(§1다이아§f)로 매칭을 시작합니다...");
+                    break;
+                case "마스터":
+                    bukkitPlayer.sendMessage("§6[랭크] §f티어(§5마스터§f)로 매칭을 시작합니다...");
+                    break;
+                case "챌린저":
+                    bukkitPlayer.sendMessage("§6[랭크] §f티어(§4챌린저§f)로 매칭을 시작합니다...");
+                    break;
+                default:
+                    bukkitPlayer.sendMessage("§c[알림] 티어 정보가 올바르지 않습니다.");
+                    break;
+            }
         } else if (bukkitPlayer != null && "친선".equals(type)) {
-            bukkitPlayer.sendMessage("§a친선대전 으로 매칭을 시작합니다...");
+            bukkitPlayer.sendMessage("§a[친선전] §f매칭을 시작합니다...");
         }
 
         startWaitingThread(player.getUuid());
@@ -95,7 +122,7 @@ public class MatchManager {
                         });
                         break;
                     }
-                    player.sendActionBar("§e[매칭] 대기 중... " + seconds + "초 경과");
+                    player.sendTitle("§6[매칭] §f대기 중... " + seconds + "초 경과", "§f현재 매칭 대기 중인 인원: §c" + rankQueue.size() + "§f명");
                 }
             } catch (InterruptedException e) {
                 // 정상 종료
@@ -136,8 +163,15 @@ public class MatchManager {
             activeSessions.put(uuid, session);
             Player player = Bukkit.getPlayer(UUID.fromString(uuid));
             if (player != null) {
+                String opponentUuid = session.getPlayers().stream()
+                        .filter(u -> !u.equals(uuid))
+                        .findFirst()
+                        .orElse("unknown");
+                Player opponent = Bukkit.getPlayer(UUID.fromString(opponentUuid));
+                String opponentName = opponent != null ? opponent.getName() : "상대";
 //                player.sendMessage("§e매칭이 성사되었습니다! 5초 안에 증강을 선택해주세요.");
-                player.sendMessage("§e매칭이 성사되었습니다! 5초 뒤에 대전에 진입합니다.");
+
+                player.sendMessage("§5" + opponentName + " §f님과의 매칭이 성사되었습니다! §65초§f 뒤에 대전에 진입합니다.");
                 // 증강 GUI
                 //player.openInventory(new AugmentSelectGUI(session).getInventory());
             }
@@ -177,8 +211,6 @@ public class MatchManager {
             winner.sendTitle("§l§a승리!", "§7포인트는 없지만 실력은 증명됐어요!", 10, 60, 10);
             winner.sendActionBar("§l§a[친선전 승리]");
 
-//            loser.sendTitle("§l§c패배", "§7친선전에서는 패배해도 손해는 없습니다!", 10, 60, 10);
-//            loser.sendActionBar("§l§c[친선전 패배]");
             RespawnMessageDto message = RespawnMessageDto.builder()
                     .title("§l§c패배")
                     .subtitle("§7친선전에서는 패배해도 손해는 없습니다!")
@@ -188,12 +220,9 @@ public class MatchManager {
             setPostRespawnMessage(loserId, message);
 
         } else if ("랭크".equals(session.getType())) {
-            int point = 23;
+            int point = 3;
             winner.sendTitle("§l§a승리!", "§7랭크 포인트 +" + point, 10, 60, 10);
             winner.sendActionBar("§l§a[랭크 승리] +" + point + " 포인트 획득!");
-
-//            loser.sendTitle("§l§c패배", "§7랭크 포인트 -" + point, 10, 60, 10);
-//            loser.sendActionBar("§l§c[랭크 패배] -" + point + " 포인트 차감...");
 
             RespawnMessageDto message = RespawnMessageDto.builder()
                     .title("§l§c패배")
@@ -243,6 +272,10 @@ public class MatchManager {
                 .type(session.getType())
                 .pointChange(pointChange)
                 .build();
+
+        String message = "[§6" + matchLogDto.getType() + "] §f" + winnerName + "님과 " + loserName + "님의 대결에서 §9" + winnerName + "§f님이 승리하였습니다!!";
+
+        Bukkit.broadcastMessage(message);
 
         // 결과 로그 디비 저장
         MatchLogDataRepository.getInstance().saveMatchLog(matchLogDto);

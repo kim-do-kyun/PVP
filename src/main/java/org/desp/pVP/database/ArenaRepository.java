@@ -49,7 +49,7 @@ public class ArenaRepository {
         for (RoomDto room : arenaMap.values()) {
             if (!room.isPlaying()) {
                 room.setPlaying(true);
-                //ArenaRepository.getInstance().updateRoomStatus(room.getRoomName(), true);
+//                ArenaRepository.getInstance().updateRoomStatus(room.getRoomName(), true);
                 return room;
             }
         }

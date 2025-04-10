@@ -6,5 +6,3 @@ depend: [MMOItems, MythicLib, MongoLibraryPlugin, MMOMail, MMOCore, BinggreAPI]
 commands:
   대전:
     aliases: ["eowjs"]
-#  전적확인:
-#    aliases: ["wjswjrghkrdls"]
