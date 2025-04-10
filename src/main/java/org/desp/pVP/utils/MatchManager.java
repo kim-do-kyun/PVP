@@ -284,10 +284,12 @@ public class MatchManager {
         session.teleportSpawn();
     }
 
-
     public boolean isInCombat(String uuid) {
         MatchSession session = activeSessions.get(uuid);
-        return session != null && session.isFightStarted();
+        if (session == null) {
+            return false;
+        }
+        return session.isFightStarted();
     }
 
     private boolean checkDuplicateQueue(MatchingPlayerDto player) {

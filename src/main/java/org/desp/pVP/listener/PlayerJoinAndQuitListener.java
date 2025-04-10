@@ -31,7 +31,7 @@ public class PlayerJoinAndQuitListener implements Listener {
                 ArenaRepository.getInstance().arenaMap.put(room.getRoomName(), room);
                 // 상대방 플레이어 구하기
                 Player opponent = Bukkit.getPlayer(session.getOpponent(player.getUniqueId().toString()));
-                if (opponent != null && opponent.isOnline()) {
+                if (opponent != null) {
                     MatchManager.getInstance().handleMatchResult(opponent, player);
                 }
             }
