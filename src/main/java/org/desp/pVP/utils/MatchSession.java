@@ -59,12 +59,14 @@ public class MatchSession {
         PotionEffect resistance = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 255, false, false, false);
 
         if (playerA != null) {
+            MatchUtils.moveOffhandFishingRodToInventory(playerA);
             playerA.addPotionEffect(slow);
             playerA.addPotionEffect(jump);
             playerA.addPotionEffect(resistance);
         }
 
         if (playerB != null) {
+            MatchUtils.moveOffhandFishingRodToInventory(playerB);
             playerB.addPotionEffect(slow);
             playerB.addPotionEffect(jump);
             playerB.addPotionEffect(resistance);
