@@ -8,6 +8,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.desp.pVP.database.ArenaRepository;
 import org.desp.pVP.database.PlayerDataRepository;
+import org.desp.pVP.database.RewardLogDataRepository;
 import org.desp.pVP.dto.RoomDto;
 import org.desp.pVP.utils.MatchManager;
 import org.desp.pVP.utils.MatchSession;
@@ -17,6 +18,7 @@ public class PlayerJoinAndQuitListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         PlayerDataRepository.getInstance().loadPlayerData(player);
+        RewardLogDataRepository.getInstance().loadRewardLogData(player);
     }
 
     @EventHandler
@@ -38,5 +40,6 @@ public class PlayerJoinAndQuitListener implements Listener {
         }
 
         PlayerDataRepository.getInstance().savePlayerData(player);
+        RewardLogDataRepository.getInstance().saveRewardLog(player);
     }
 }

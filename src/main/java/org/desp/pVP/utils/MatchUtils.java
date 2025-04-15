@@ -1,8 +1,16 @@
 package org.desp.pVP.utils;
 
+import com.binggre.mmomail.MMOMail;
+import com.binggre.mmomail.objects.Mail;
+import java.util.ArrayList;
+import java.util.List;
+import net.Indyuce.mmoitems.MMOItems;
+import net.Indyuce.mmoitems.api.Type;
+import net.Indyuce.mmoitems.api.item.mmoitem.MMOItem;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.desp.pVP.dto.RewardDataDto;
 
 public class MatchUtils {
 
@@ -14,6 +22,38 @@ public class MatchUtils {
         else if (point >= 40) return "골드";
         else if (point >= 20) return "실버";
         else return "브론즈";
+    }
+
+    public static void sendReward(List<ItemStack> reward, Player player) {
+        MMOMail mmoMail = MMOMail.getInstance();
+        Mail rewardMail = mmoMail.getMailAPI().createMail(
+                "시스템",
+                "승급 보상입니다.",
+                0,
+                reward
+        );
+        mmoMail.getMailAPI().sendMail(player.getName(), rewardMail);
+    }
+
+    public static List<ItemStack> getReward(List<RewardDataDto> reward) {
+        List<ItemStack> rewardItems = new ArrayList<>();
+
+        for (RewardDataDto rewardDataDto : reward) {
+            ItemStack mmoItemById = getMMOItemById(rewardDataDto.getItem_id());
+            mmoItemById.setAmount(rewardDataDto.getAmount());
+            rewardItems.add(mmoItemById);
+        }
+        return rewardItems;
+    }
+
+    public static ItemStack getMMOItemById(String itemId) {
+        for (Type type : MMOItems.plugin.getTypes().getAll()) {
+            MMOItem mmoItem = MMOItems.plugin.getMMOItem(type, itemId);
+            if (mmoItem != null) {
+                return mmoItem.newBuilder().build();
+            }
+        }
+        return null;
     }
 
     public static void moveOffhandFishingRodToInventory(Player player) {
@@ -36,4 +76,5 @@ public class MatchUtils {
             player.getInventory().setItemInOffHand(null);
         }
     }
+
 }

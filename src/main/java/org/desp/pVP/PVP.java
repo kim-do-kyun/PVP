@@ -8,6 +8,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.desp.pVP.command.MatchingCommand;
 import org.desp.pVP.database.ArenaRepository;
 import org.desp.pVP.database.PlayerDataRepository;
+import org.desp.pVP.database.RewardDataRepository;
+import org.desp.pVP.database.RewardLogDataRepository;
 import org.desp.pVP.listener.AugmentConfirmListener;
 import org.desp.pVP.listener.PVPEndListener;
 import org.desp.pVP.listener.PlayerDuringMatchListener;
@@ -28,6 +30,7 @@ public final class PVP extends JavaPlugin {
         Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
         for (Player player : onlinePlayers) {
             PlayerDataRepository.getInstance().loadPlayerData(player);
+            RewardLogDataRepository.getInstance().loadRewardLogData(player);
         }
 
         Bukkit.getPluginManager().registerEvents(new PlayerJoinAndQuitListener(), this);
@@ -39,6 +42,7 @@ public final class PVP extends JavaPlugin {
         getCommand("대전").setExecutor(new MatchingCommand());
 
         ArenaRepository.getInstance().loadAllRooms();
+        RewardDataRepository.getInstance().loadRewardData();
     }
 
     @Override
@@ -48,6 +52,7 @@ public final class PVP extends JavaPlugin {
         for (Player player : onlinePlayers) {
             PlayerDataRepository.getInstance().savePlayerData(player);
             MatchManager.getInstance().stopWaitingThread(player.getUniqueId().toString());
+            RewardLogDataRepository.getInstance().saveRewardLog(player);
         }
 
     }
