@@ -69,7 +69,7 @@ public class MatchingCommand implements CommandExecutor, TabCompleter {
             }
         } else if ("전적확인".equals(strings[0])) {
             if (strings.length == 1) {
-                player.sendMessage("§f 플레이어님의 티어 : " + tier + " / 승: " + wins + " / 패: " + losses);
+                player.sendMessage("§f 플레이어님의 티어 : " + tier + "("+ point + "점) / 승: " + wins + " / 패: " + losses);
             } else if (strings.length == 2) {
                 String user_id = strings[1];
                 String playerNameToUUID = PlayerDataRepository.getInstance().getPlayerNameToUUID(user_id);

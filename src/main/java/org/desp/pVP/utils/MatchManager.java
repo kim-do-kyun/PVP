@@ -46,7 +46,6 @@ public class MatchManager {
         }
         Player bukkitPlayer = Bukkit.getPlayer(UUID.fromString(player.getUuid()));
 
-
         if (bukkitPlayer != null && "랭크".equals(type)) {
             switch (player.getTier()) {
                 case "브론즈":
