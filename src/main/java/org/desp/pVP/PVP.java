@@ -8,14 +8,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.desp.pVP.command.MatchingCommand;
 import org.desp.pVP.database.ArenaRepository;
 import org.desp.pVP.database.PlayerDataRepository;
-import org.desp.pVP.database.RewardDataRepository;
-import org.desp.pVP.database.RewardLogDataRepository;
+import org.desp.pVP.database.reward.RewardDataRepository;
+import org.desp.pVP.database.reward.RewardLogRepository;
+import org.desp.pVP.database.reward.SeasonRewardDataRepository;
 import org.desp.pVP.listener.AugmentConfirmListener;
 import org.desp.pVP.listener.PVPEndListener;
 import org.desp.pVP.listener.PlayerDuringMatchListener;
 import org.desp.pVP.listener.PlayerJoinAndQuitListener;
 import org.desp.pVP.listener.PlayerRespawnListener;
 import org.desp.pVP.listener.PlayerStopListener;
+import org.desp.pVP.threadUtil.PlayerRankScheduler;
 import org.desp.pVP.utils.MatchManager;
 
 public final class PVP extends JavaPlugin {
@@ -27,10 +29,15 @@ public final class PVP extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
+        PlayerRankScheduler scheduler = new PlayerRankScheduler();
+        scheduler.start();
+        scheduler.challengerUpdater();
+
         Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
         for (Player player : onlinePlayers) {
             PlayerDataRepository.getInstance().loadPlayerData(player);
-            RewardLogDataRepository.getInstance().loadRewardLogData(player);
+            RewardLogRepository.getInstance().loadRewardLogData(player);
+
         }
 
         Bukkit.getPluginManager().registerEvents(new PlayerJoinAndQuitListener(), this);
@@ -43,6 +50,7 @@ public final class PVP extends JavaPlugin {
 
         ArenaRepository.getInstance().loadAllRooms();
         RewardDataRepository.getInstance().loadRewardData();
+        SeasonRewardDataRepository.getInstance().loadRewardData();
     }
 
     @Override
@@ -52,7 +60,7 @@ public final class PVP extends JavaPlugin {
         for (Player player : onlinePlayers) {
             PlayerDataRepository.getInstance().savePlayerData(player);
             MatchManager.getInstance().stopWaitingThread(player.getUniqueId().toString());
-            RewardLogDataRepository.getInstance().saveRewardLog(player);
+            RewardLogRepository.getInstance().saveRewardLog(player);
         }
 
     }

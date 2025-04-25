@@ -1,19 +1,28 @@
 package org.desp.pVP.database;
 
+import static org.desp.pVP.utils.MatchUtils.getAnyPlayer;
+import static org.desp.pVP.utils.MatchUtils.getTierFromPoint;
+import static org.desp.pVP.utils.MatchUtils.giveRankUpReward;
+
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.bson.Document;
 import org.bukkit.entity.Player;
 import org.desp.pVP.dto.PlayerDataDto;
+import org.desp.pVP.dto.PlayerRankInfoDto;
 
 public class PlayerDataRepository {
 
     private static PlayerDataRepository instance;
     private final MongoCollection<Document> playerList;
     public static Map<String, PlayerDataDto> playerDataCache = new HashMap<>();
+    public static List<PlayerRankInfoDto> playerRankInfoCache = new ArrayList<>();
 
     public PlayerDataRepository() {
         DatabaseRegister database = new DatabaseRegister();
@@ -90,7 +99,86 @@ public class PlayerDataRepository {
         return null;
     }
 
+    public void sortAllPlayerRank() {
+        Map<String, PlayerDataDto> playerDataCache = getPlayerDataCache();
+
+        for (Entry<String, PlayerDataDto> playerData : playerDataCache.entrySet()) {
+            PlayerDataDto playerInfo = playerData.getValue();
+            String userId = playerInfo.getUser_id();
+            int point = playerInfo.getPoint();
+            String tier = getTierFromPoint(point);
+
+            PlayerRankInfoDto playerInfoDto = PlayerRankInfoDto.builder()
+                    .playerName(userId)
+                    .rank(tier)
+                    .points(point)
+                    .build();
+
+            playerRankInfoCache.add(playerInfoDto);
+        }
+
+        playerRankInfoCache.sort((a, b) -> Integer.compare(b.getPoints(), a.getPoints()));
+    }
+
+    public int getPlayerRank(String userName) {
+        for (int i = 0; i < playerRankInfoCache.size(); i++) {
+            PlayerRankInfoDto player = playerRankInfoCache.get(i);
+            if (player.getPlayerName().equals(userName)) {
+                return i + 1;
+            }
+        }
+        return -1;
+    }
+
+    public List<PlayerRankInfoDto> getTop10Players() {
+        int limit = Math.min(10, playerRankInfoCache.size());
+        return playerRankInfoCache.subList(0, limit);
+    }
+
+    public Map<String, PlayerRankInfoDto> getChallengerPlayers() {
+        List<PlayerRankInfoDto> top10Players = getTop10Players();
+
+        Map<String, PlayerRankInfoDto> challengerPlayers = new HashMap<>();
+
+        for (PlayerRankInfoDto top10Player : top10Players) {
+            if (top10Player.getPoints() >= 120) {
+                challengerPlayers.put(top10Player.getPlayerName(), top10Player);
+                if (challengerPlayers.size() == 5) {
+                    break;
+                }
+            }
+
+            //challengerPlayers.put(top10Player.getPlayerName(), top10Player);
+        }
+
+        return challengerPlayers;
+    }
+
+    public void updateChallengerPlayers() {
+        sortAllPlayerRank();
+
+        Map<String, PlayerRankInfoDto> challengerPlayers = getChallengerPlayers();
+        if (challengerPlayers.isEmpty()) {
+            return;
+        }
+
+        for (Map.Entry<String, PlayerRankInfoDto> entry : challengerPlayers.entrySet()) {
+            String playerName = entry.getKey();
+            PlayerRankInfoDto playerRankInfoDto = entry.getValue();
+
+            playerRankInfoDto.setRank("챌린저");
+
+            PlayerDataDto playerDataDto = playerDataCache.get(playerName);
+
+            if (playerDataDto != null) {
+                giveRankUpReward(getAnyPlayer(playerDataDto.getUser_id()), playerDataDto.getTier(), "챌린저");
+                playerDataDto.setTier("챌린저");
+            }
+        }
+    }
+
     public Map<String, PlayerDataDto> getPlayerDataCache() {
         return playerDataCache;
     }
+
 }

@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.desp.pVP.database.PlayerDataRepository;
 import org.desp.pVP.dto.MatchingPlayerDto;
 import org.desp.pVP.dto.PlayerDataDto;
+import org.desp.pVP.dto.PlayerRankInfoDto;
 import org.desp.pVP.utils.DateUtils;
 import org.desp.pVP.utils.MatchManager;
 import org.jetbrains.annotations.NotNull;
@@ -77,10 +78,33 @@ public class MatchingCommand implements CommandExecutor, TabCompleter {
                         .get(playerNameToUUID);
                 player.sendMessage("§f " + user_id +  "님의 티어 : " + playerDataDto.getTier() + " / 승: " + playerDataDto.getWins() + " / 패: " + playerDataDto.getLosses());
             }
+        } else if ("순위표".equals(strings[0])) {
+            int playerRank = PlayerDataRepository.getInstance().getPlayerRank(player.getName());
+            List<PlayerRankInfoDto> top10Players = PlayerDataRepository.getInstance().getTop10Players();
+
+            player.sendMessage("§6====== §e📊 순위표 TOP 10 §6======");
+
+            for (int i = 0; i < top10Players.size(); i++) {
+                PlayerRankInfoDto topPlayer = top10Players.get(i);
+                String rankLine = String.format("§f%d위 - §b%s§f | §e%s§f | %d점",
+                        i + 1,
+                        topPlayer.getPlayerName(),
+                        topPlayer.getRank(),
+                        topPlayer.getPoints()
+                );
+                player.sendMessage(rankLine);
+            }
+
+            player.sendMessage("§6==========================");
+
+            if (playerRank != -1) {
+                player.sendMessage("§a당신의 현재 순위는 §b" + playerRank + "위§a입니다!");
+            } else {
+                player.sendMessage("§c당신은 현재 랭킹에 없습니다.");
+            }
         }
         return true;
     }
-
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command,
@@ -91,6 +115,7 @@ public class MatchingCommand implements CommandExecutor, TabCompleter {
             completions.add("매칭");
             completions.add("매칭취소");
             completions.add("전적확인");
+            completions.add("순위표");
         } else if (strings.length == 2 && "매칭".equalsIgnoreCase(strings[0])) {
             completions.add("랭크");
             completions.add("친선");

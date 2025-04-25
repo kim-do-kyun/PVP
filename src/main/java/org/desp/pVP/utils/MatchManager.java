@@ -1,6 +1,7 @@
 package org.desp.pVP.utils;
 
 import static org.desp.pVP.utils.MatchUtils.getTierFromPoint;
+import static org.desp.pVP.utils.MatchUtils.giveRankUpReward;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,19 +11,14 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.desp.pVP.PVP;
 import org.desp.pVP.database.ArenaRepository;
 import org.desp.pVP.database.MatchLogDataRepository;
 import org.desp.pVP.database.PlayerDataRepository;
-import org.desp.pVP.database.RewardDataRepository;
-import org.desp.pVP.database.RewardLogDataRepository;
 import org.desp.pVP.dto.MatchLogDto;
 import org.desp.pVP.dto.MatchingPlayerDto;
 import org.desp.pVP.dto.PlayerDataDto;
 import org.desp.pVP.dto.RespawnMessageDto;
-import org.desp.pVP.dto.RewardDataDto;
-import org.desp.pVP.dto.RewardLogDto;
 import org.desp.pVP.dto.RoomDto;
 
 public class MatchManager {
@@ -245,25 +241,7 @@ public class MatchManager {
             String winnerNewTier = getTierFromPoint(winnerDataDto.getPoint());
             winnerDataDto.setTier(winnerNewTier);
 
-            Map<String, RewardLogDto> rewardLogDataCache = RewardLogDataRepository.getInstance()
-                    .getRewardLogDataCache();
-            RewardLogDto rewardLogDto = rewardLogDataCache.get(winner.getUniqueId().toString());
-
-
-            if (!winnerPrevTier.equals(winnerNewTier) && rewardLogDto.getRewardedRank().stream().noneMatch(winnerNewTier::equals)) {
-                winner.sendMessage("§b[승급] 티어가 " + winnerPrevTier + " → " + winnerNewTier + " 로 승급되었습니다!");
-
-                Map<String, List<RewardDataDto>> rewardDataDtoCache = RewardDataRepository.getInstance()
-                        .getRewardDataDtoCache();
-
-                List<RewardDataDto> rewardDataDtos = rewardDataDtoCache.get(winnerNewTier);
-                // 보상 지급
-                MatchUtils.sendReward(MatchUtils.getReward(rewardDataDtos), winner);
-
-                // 캐시에 저장
-                rewardLogDto.getRewardedRank().add(winnerNewTier);
-                rewardLogDataCache.put(winner.getUniqueId().toString(), rewardLogDto);
-            }
+            giveRankUpReward(winner, winnerPrevTier, winnerNewTier);
             playerDataCache.put(winnerId, winnerDataDto);
 
             // 패배시
@@ -304,6 +282,8 @@ public class MatchManager {
 
         session.teleportSpawn();
     }
+
+
 
     public boolean isInCombat(String uuid) {
         MatchSession session = activeSessions.get(uuid);

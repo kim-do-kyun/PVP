@@ -1,4 +1,4 @@
-package org.desp.pVP.database;
+package org.desp.pVP.database.reward;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
@@ -8,23 +8,24 @@ import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import org.bson.Document;
+import org.desp.pVP.database.DatabaseRegister;
 import org.desp.pVP.dto.RewardDataDto;
 
-public class RewardDataRepository {
+public class SeasonRewardDataRepository {
 
-    private static RewardDataRepository instance;
+    private static SeasonRewardDataRepository instance;
     private final MongoCollection<Document> rewardDB;
     @Getter
-    private final Map<String, List<RewardDataDto>> rewardDataDtoCache = new HashMap<>();
+    private final Map<String, List<RewardDataDto>> seasonRewardDataDtoCache = new HashMap<>();
 
-    public RewardDataRepository() {
+    public SeasonRewardDataRepository() {
         DatabaseRegister database = new DatabaseRegister();
-        this.rewardDB = database.getDatabase().getCollection("RewardData");
+        this.rewardDB = database.getDatabase().getCollection("SeasonRewardData");
     }
 
-    public static RewardDataRepository getInstance() {
+    public static SeasonRewardDataRepository getInstance() {
         if (instance == null) {
-            instance = new RewardDataRepository();
+            instance = new SeasonRewardDataRepository();
         }
         return instance;
     }
@@ -47,7 +48,7 @@ public class RewardDataRepository {
                     rewardData.add(rewardDataDto);
                 }
             }
-            rewardDataDtoCache.put(rank, rewardData);
+            seasonRewardDataDtoCache.put(rank, rewardData);
         }
     }
 }

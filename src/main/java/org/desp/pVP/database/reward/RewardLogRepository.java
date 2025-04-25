@@ -1,4 +1,4 @@
-package org.desp.pVP.database;
+package org.desp.pVP.database.reward;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -10,23 +10,24 @@ import java.util.Map;
 import lombok.Getter;
 import org.bson.Document;
 import org.bukkit.entity.Player;
+import org.desp.pVP.database.DatabaseRegister;
 import org.desp.pVP.dto.RewardLogDto;
 
-public class RewardLogDataRepository {
+public class RewardLogRepository {
 
-    private static RewardLogDataRepository instance;
+    private static RewardLogRepository instance;
     private final MongoCollection<Document> rewardLogDB;
     @Getter
     private final Map<String, RewardLogDto> rewardLogDataCache = new HashMap<>();
 
-    public RewardLogDataRepository() {
+    public RewardLogRepository() {
         DatabaseRegister database = new DatabaseRegister();
         this.rewardLogDB = database.getDatabase().getCollection("RewardLog");
     }
 
-    public static RewardLogDataRepository getInstance() {
+    public static RewardLogRepository getInstance() {
         if (instance == null) {
-            instance = new RewardLogDataRepository();
+            instance = new RewardLogRepository();
         }
         return instance;
     }
