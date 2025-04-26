@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
 import org.bson.Document;
-import org.bukkit.entity.Player;
 import org.desp.pVP.dto.MatchLogDto;
 
 public class MatchLogDataRepository {
@@ -38,5 +37,15 @@ public class MatchLogDataRepository {
                 .append("pointChange", matchLog.getPointChange());
 
         matchLogDB.insertOne(document);
+    }
+
+    public void resetMatchLog() {
+        try {
+            matchLogDataCache.clear();
+            matchLogDB.deleteMany(new Document());
+            System.out.println("PVP MatchLog DB 초기화 완료");
+        } catch (Exception e) {
+            System.out.println("PVP MatchLog DB 데이터 삭제 중 오류 발생: " + e.getMessage());
+        }
     }
 }

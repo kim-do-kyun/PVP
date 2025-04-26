@@ -11,6 +11,7 @@ import org.desp.pVP.database.PlayerDataRepository;
 import org.desp.pVP.database.reward.RewardDataRepository;
 import org.desp.pVP.database.reward.RewardLogRepository;
 import org.desp.pVP.database.reward.SeasonRewardDataRepository;
+import org.desp.pVP.database.reward.SeasonRewardLogRepository;
 import org.desp.pVP.listener.AugmentConfirmListener;
 import org.desp.pVP.listener.PVPEndListener;
 import org.desp.pVP.listener.PlayerDuringMatchListener;
@@ -37,7 +38,6 @@ public final class PVP extends JavaPlugin {
         for (Player player : onlinePlayers) {
             PlayerDataRepository.getInstance().loadPlayerData(player);
             RewardLogRepository.getInstance().loadRewardLogData(player);
-
         }
 
         Bukkit.getPluginManager().registerEvents(new PlayerJoinAndQuitListener(), this);
@@ -61,6 +61,7 @@ public final class PVP extends JavaPlugin {
             PlayerDataRepository.getInstance().savePlayerData(player);
             MatchManager.getInstance().stopWaitingThread(player.getUniqueId().toString());
             RewardLogRepository.getInstance().saveRewardLog(player);
+            SeasonRewardLogRepository.getInstance().saveRewardLog(player);
         }
 
     }

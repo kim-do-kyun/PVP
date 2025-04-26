@@ -39,8 +39,9 @@ public class SeasonRewardDataRepository {
             List<RewardDataDto> rewardData = new ArrayList<>();
             for (String reward : rewards) {
                 String[] split = reward.split(":");
-                if (split.length == 2) {
+                    if (split.length == 2) {
                     RewardDataDto rewardDataDto = RewardDataDto.builder()
+                            .item_info(reward)
                             .item_id(split[0])
                             .amount(Integer.parseInt(split[1]))
                             .build();

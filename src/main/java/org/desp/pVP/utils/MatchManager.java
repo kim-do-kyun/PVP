@@ -3,6 +3,8 @@ package org.desp.pVP.utils;
 import static org.desp.pVP.utils.MatchUtils.getTierFromPoint;
 import static org.desp.pVP.utils.MatchUtils.giveRankUpReward;
 
+import com.binggre.velocitysocketclient.VelocityClient;
+import com.binggre.velocitysocketclient.listener.BroadcastStringVelocityListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -171,7 +173,12 @@ public class MatchManager {
                 String opponentName = opponent != null ? opponent.getName() : "상대";
 //                player.sendMessage("§e매칭이 성사되었습니다! 5초 안에 증강을 선택해주세요.");
 
-                player.sendMessage("§5" + opponentName + " §f님과의 매칭이 성사되었습니다! §65초§f 뒤에 대전에 진입합니다.");
+                if ("랭크".equals(type)) {
+                    String message = "§6[랭크] §f" + opponentName + "님과 " + player.getName() + "님의 매칭이 성사되었습니다! §65초§f 뒤에 대전에 진입합니다!";
+                    VelocityClient.getInstance().getConnectClient().send(BroadcastStringVelocityListener.class, message);
+                } else {
+                    player.sendMessage("§5" + opponentName + " §f님과의 매칭이 성사되었습니다! §65초§f 뒤에 대전에 진입합니다.");
+                }
                 // 증강 GUI
                 //player.openInventory(new AugmentSelectGUI(session).getInventory());
             }
@@ -272,9 +279,11 @@ public class MatchManager {
                 .pointChange(pointChange)
                 .build();
 
-        String message = "[§6" + matchLogDto.getType() + "] §f" + winnerName + "님과 " + loserName + "님의 대결에서 §9" + winnerName + "§f님이 승리하였습니다!!";
+        String message = "§6[" + matchLogDto.getType() + "] §f" + winnerName + "님과 " + loserName + "님의 대결에서 §9" + winnerName + "§f님이 승리하였습니다!!";
 
         Bukkit.broadcastMessage(message);
+        VelocityClient.getInstance().getConnectClient().send(BroadcastStringVelocityListener.class, message);
+
         session.setFightStarted(false);
 
         // 결과 로그 디비 저장
@@ -282,8 +291,6 @@ public class MatchManager {
 
         session.teleportSpawn();
     }
-
-
 
     public boolean isInCombat(String uuid) {
         MatchSession session = activeSessions.get(uuid);

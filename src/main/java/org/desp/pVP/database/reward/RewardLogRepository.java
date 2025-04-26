@@ -71,4 +71,15 @@ public class RewardLogRepository {
 
         rewardLogDB.replaceOne(filter, document, new ReplaceOptions().upsert(true));
     }
+
+    public void resetRewardLog() {
+        try {
+            rewardLogDataCache.clear();
+            rewardLogDB.deleteMany(new Document());
+            System.out.println("PVP RewardLog DB 초기화 완료");
+        } catch (Exception e) {
+            System.out.println("PVP RewardLog DB 데이터 삭제 중 오류 발생: " + e.getMessage());
+        }
+
+    }
 }

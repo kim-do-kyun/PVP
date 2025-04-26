@@ -7,6 +7,7 @@ import lombok.Setter;
 @Getter @Setter
 @Builder
 public class RewardDataDto {
+    private String item_info;
     private String item_id;
     private int amount;
 }

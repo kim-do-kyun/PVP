@@ -100,6 +100,7 @@ public class PlayerDataRepository {
     }
 
     public void sortAllPlayerRank() {
+        playerRankInfoCache.clear();
         Map<String, PlayerDataDto> playerDataCache = getPlayerDataCache();
 
         for (Entry<String, PlayerDataDto> playerData : playerDataCache.entrySet()) {
@@ -147,8 +148,6 @@ public class PlayerDataRepository {
                     break;
                 }
             }
-
-            //challengerPlayers.put(top10Player.getPlayerName(), top10Player);
         }
 
         return challengerPlayers;
@@ -181,4 +180,18 @@ public class PlayerDataRepository {
         return playerDataCache;
     }
 
+    public List<PlayerRankInfoDto> getPlayerRankInfoCache() {
+        return playerRankInfoCache;
+    }
+
+    public void resetPlayerDataDB() {
+        try {
+            playerDataCache.clear();
+            playerRankInfoCache.clear();
+            playerList.deleteMany(new Document());
+            System.out.println("PVP Player DB 초기화 완료");
+        } catch (Exception e) {
+            System.out.println("PVP PlayerDB 데이터 삭제 중 오류 발생: " + e.getMessage());
+        }
+    }
 }

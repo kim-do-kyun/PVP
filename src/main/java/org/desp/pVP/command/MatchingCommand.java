@@ -37,10 +37,11 @@ public class MatchingCommand implements CommandExecutor, TabCompleter {
                 .build();
 
         if (strings.length == 0) {
-            player.sendMessage("§f /대전 매칭 랭크 - 랭크전 매칭 대기열에 진입합니다.");
-            player.sendMessage("§f /대전 매칭 친선 - 친선전 매칭 대기열에 진입합니다.");
-            player.sendMessage("§f /대전 매칭취소 - 매칭 대기열에서 퇴장합니다.");
-            player.sendMessage("§f /대전 전적확인 - 랭크 티어와 승, 패 전적을 확인할 수 있습니다.");
+            player.sendMessage("§f /대전 매칭 랭크 - §c랭크전 §7매칭 대기열에 진입합니다.");
+            player.sendMessage("§f /대전 매칭 친선 - §9친선전 §7매칭 대기열에 진입합니다.");
+            player.sendMessage("§f /대전 매칭취소 - §7매칭 대기열에서 퇴장합니다.");
+            player.sendMessage("§f /대전 전적확인 - §7랭크 티어와 승, 패 전적을 확인할 수 있습니다.");
+            player.sendMessage("§f /대전 순위표 - §7상위 10명의 순위와 자신의 순위를 확인할 수 있습니다.");
             return true;
         } else if ("매칭".equals(strings[0]) && strings.length == 1) {
             player.sendMessage("§f /대전 매칭 랭크 - 랭크전 매칭 대기열에 진입합니다.");
@@ -81,6 +82,10 @@ public class MatchingCommand implements CommandExecutor, TabCompleter {
         } else if ("순위표".equals(strings[0])) {
             int playerRank = PlayerDataRepository.getInstance().getPlayerRank(player.getName());
             List<PlayerRankInfoDto> top10Players = PlayerDataRepository.getInstance().getTop10Players();
+
+            for (PlayerRankInfoDto top10Player : top10Players) {
+                System.out.println("top10Player.getPlayerName() = " + top10Player.getPlayerName());
+            }
 
             player.sendMessage("§6====== §e📊 순위표 TOP 10 §6======");
 
