@@ -161,6 +161,15 @@ public class MatchManager {
             recentOpponentMap.put(b.getUuid(), a.getUuid());
         }
 
+        String playerAName = Bukkit.getPlayer(UUID.fromString(a.getUuid())) != null ? Bukkit.getPlayer(UUID.fromString(a.getUuid())).getName() : "플레이어A";
+        String playerBName = Bukkit.getPlayer(UUID.fromString(b.getUuid())) != null ? Bukkit.getPlayer(UUID.fromString(b.getUuid())).getName() : "플레이어B";
+
+        if ("랭크".equals(type)) {
+            String message = "§6[랭크] §f" + playerBName + "님과 " + playerAName + "님의 매칭이 성사되었습니다! §65초§f 뒤에 대전에 진입합니다!";
+            VelocityClient.getInstance().getConnectClient().send(BroadcastStringVelocityListener.class, message);
+            Bukkit.broadcastMessage(message);
+        }
+
         for (String uuid : session.getPlayers()) {
             activeSessions.put(uuid, session);
             Player player = Bukkit.getPlayer(UUID.fromString(uuid));
@@ -173,11 +182,7 @@ public class MatchManager {
                 String opponentName = opponent != null ? opponent.getName() : "상대";
 //                player.sendMessage("§e매칭이 성사되었습니다! 5초 안에 증강을 선택해주세요.");
 
-                if ("랭크".equals(type)) {
-                    String message = "§6[랭크] §f" + opponentName + "님과 " + player.getName() + "님의 매칭이 성사되었습니다! §65초§f 뒤에 대전에 진입합니다!";
-                    VelocityClient.getInstance().getConnectClient().send(BroadcastStringVelocityListener.class, message);
-                    Bukkit.broadcastMessage(message);
-                } else {
+                if (!"랭크".equals(type)) {  // 친선일 때만 개인 메시지 보내기
                     player.sendMessage("§5" + opponentName + " §f님과의 매칭이 성사되었습니다! §65초§f 뒤에 대전에 진입합니다.");
                 }
                 // 증강 GUI
