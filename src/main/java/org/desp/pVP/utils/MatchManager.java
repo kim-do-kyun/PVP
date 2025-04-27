@@ -176,6 +176,7 @@ public class MatchManager {
                 if ("랭크".equals(type)) {
                     String message = "§6[랭크] §f" + opponentName + "님과 " + player.getName() + "님의 매칭이 성사되었습니다! §65초§f 뒤에 대전에 진입합니다!";
                     VelocityClient.getInstance().getConnectClient().send(BroadcastStringVelocityListener.class, message);
+                    Bukkit.broadcastMessage(message);
                 } else {
                     player.sendMessage("§5" + opponentName + " §f님과의 매칭이 성사되었습니다! §65초§f 뒤에 대전에 진입합니다.");
                 }

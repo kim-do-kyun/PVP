@@ -48,6 +48,7 @@ public final class PVP extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerDuringMatchListener(), this);
         getCommand("대전").setExecutor(new MatchingCommand());
 
+        PlayerDataRepository.getInstance().loadAllPlayerData();
         ArenaRepository.getInstance().loadAllRooms();
         RewardDataRepository.getInstance().loadRewardData();
         SeasonRewardDataRepository.getInstance().loadRewardData();

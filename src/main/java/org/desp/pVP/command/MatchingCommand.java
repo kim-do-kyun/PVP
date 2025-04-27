@@ -77,15 +77,17 @@ public class MatchingCommand implements CommandExecutor, TabCompleter {
                 String playerNameToUUID = PlayerDataRepository.getInstance().getPlayerNameToUUID(user_id);
                 PlayerDataDto playerDataDto = PlayerDataRepository.getInstance().getPlayerDataCache()
                         .get(playerNameToUUID);
+
+                if (playerDataDto == null) {
+                    player.sendMessage("§c 존재하지 않는 플레이어입니다");
+                    return true;
+                }
+
                 player.sendMessage("§f " + user_id +  "님의 티어 : " + playerDataDto.getTier() + " / 승: " + playerDataDto.getWins() + " / 패: " + playerDataDto.getLosses());
             }
         } else if ("순위표".equals(strings[0])) {
             int playerRank = PlayerDataRepository.getInstance().getPlayerRank(player.getName());
             List<PlayerRankInfoDto> top10Players = PlayerDataRepository.getInstance().getTop10Players();
-
-            for (PlayerRankInfoDto top10Player : top10Players) {
-                System.out.println("top10Player.getPlayerName() = " + top10Player.getPlayerName());
-            }
 
             player.sendMessage("§6====== §e📊 순위표 TOP 10 §6======");
 

@@ -36,6 +36,28 @@ public class PlayerDataRepository {
         return instance;
     }
 
+    public void loadAllPlayerData() {
+        for (Document document : playerList.find()) {
+            String user_id = document.getString("user_id");
+            String uuid = document.getString("uuid");
+            String tier = document.getString("tier");
+            int point = document.getInteger("point");
+            int wins = document.getInteger("wins");
+            int losses = document.getInteger("losses");
+
+            PlayerDataDto playerDto = PlayerDataDto.builder()
+                    .user_id(user_id)
+                    .uuid(uuid)
+                    .tier(tier)
+                    .point(point)
+                    .wins(wins)
+                    .losses(losses)
+                    .build();
+
+            playerDataCache.put(uuid, playerDto);
+        }
+    }
+
     public void loadPlayerData(Player player) {
         String user_id = player.getName();
         String uuid = player.getUniqueId().toString();
@@ -101,7 +123,6 @@ public class PlayerDataRepository {
 
     public void sortAllPlayerRank() {
         playerRankInfoCache.clear();
-        Map<String, PlayerDataDto> playerDataCache = getPlayerDataCache();
 
         for (Entry<String, PlayerDataDto> playerData : playerDataCache.entrySet()) {
             PlayerDataDto playerInfo = playerData.getValue();
@@ -133,6 +154,11 @@ public class PlayerDataRepository {
 
     public List<PlayerRankInfoDto> getTop10Players() {
         int limit = Math.min(10, playerRankInfoCache.size());
+        System.out.println("======================");
+        System.out.println("playerDataCache = " + playerDataCache.size());
+        System.out.println("playerRankInfoCache = " + playerRankInfoCache.size());
+        System.out.println("limit = " + limit);
+        System.out.println("======================");
         return playerRankInfoCache.subList(0, limit);
     }
 
