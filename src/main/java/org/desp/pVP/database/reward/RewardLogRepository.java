@@ -66,8 +66,7 @@ public class RewardLogRepository {
                 .append("uuid", rewardLog.getUuid())
                 .append("rewardedRank", rewardLog.getRewardedRank());
 
-        Document filter = new Document("uuid", rewardLog.getUuid())
-                .append("rewardedRank", rewardLog.getRewardedRank());
+        Document filter = new Document("uuid", rewardLog.getUuid());
 
         rewardLogDB.replaceOne(filter, document, new ReplaceOptions().upsert(true));
     }
